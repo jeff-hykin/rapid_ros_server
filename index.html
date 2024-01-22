@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nearest Match</title>
+    <title>Web Template</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://unpkg.com/css-baseline/css/3.css">
-    <link rel="stylesheet" href="https://cdn.skypack.dev/gridjs@6.0.6//dist/theme/mermaid.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto');
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
@@ -43,6 +40,9 @@
             --decent-color-21: cadetblue;
             --decent-color-22: darkorchid;
             --decent-color-23: blueviolet;
+        }
+        * {
+            min-width: 0;
         }
         body {
             font-size: 0.9em;
@@ -84,24 +84,21 @@
         </div>
     </body>
     <script>
-        // 
-        // Synchonous/Fast loading animation
-        // 
-            const animateLoader = ()=>{
-                const element = document.getElementById("good-component--initial-loader")
-                element && element.animate(
-                    [
-                        { transform: 'rotate(0turn)' },
-                        { transform: 'rotate(1turn)' },
-                    ],
-                    {
-                        duration: 1000,
-                        iterations: Infinity,
-                        easing: 'ease',
-                    },
-                )
-            }
-            document.body ? animateLoader() : document.addEventListener("DOMContentLoaded", animateLoader)
+        const animateLoader = ()=>{
+            const element = document.getElementById("good-component--initial-loader")
+            element && element.animate(
+                [
+                    { transform: 'rotate(0turn)' },
+                    { transform: 'rotate(1turn)' },
+                ],
+                {
+                    duration: 1000,
+                    iterations: Infinity,
+                    easing: 'ease',
+                },
+            )
+        }
+        document.body ? animateLoader() : document.addEventListener("DOMContentLoaded", animateLoader)
     </script>
+
 <script src="./main.js" type="module"></script>
-</html>
