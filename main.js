@@ -1,4 +1,4 @@
-import { Elemental } from "https://deno.land/x/elementalist@0.5.34/main/deno.js?code"
+import { Elemental, combineClasses, css, passAlongProps } from "https://deno.land/x/elementalist@0.6.0/main/deno.js?code"
 import { css, components, Column, Row, askForFiles, Code, Input, Button, Checkbox, Dropdown, popUp, cx, } from "https://deno.land/x/good_component@0.2.12/elements.js"
 import { fadeIn, fadeOut } from "https://deno.land/x/good_component@0.2.12/main/animations.js"
 import { showToast } from "https://deno.land/x/good_component@0.2.12/main/actions.js"
