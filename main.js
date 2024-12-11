@@ -5,7 +5,7 @@ import { showToast } from "https://deno.land/x/good_component@0.2.12/main/action
 import { addDynamicStyleFlags, setupStyles, createCssClass, setupClassStyles, hoverStyleHelper, combineClasses, mergeStyles, AfterSilent, removeAllChildElements } from "https://deno.land/x/good_component@0.2.12/main/helpers.js"
 import { zip, enumerate, count, permute, combinations, wrapAroundGet } from "https://deno.land/x/good@1.5.1.0/array.js"
 
-import storageObject from "https://deno.land/x/storage_object@0.0.2.0/main.js"
+import storageObject from "https://deno.land/x/storage_object@0.0.3.5/main.js"
 
 const { html } = Elemental({
     ...components,
