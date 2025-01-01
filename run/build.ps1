@@ -5,11 +5,11 @@ echo --% >/dev/null;: ' | out-null
 #
 # for not-Windows operating systems
 #
-deno run -A npm:vite build
+deno run -A https://esm.sh/gh/jeff-hykin/bite@e070c4af1e/vite/bin/vite.js build
 
 exit #>
 
 #
 # for windows (powershell)
 #
-deno run -A npm:vite build
+deno run -A https://esm.sh/gh/jeff-hykin/bite@e070c4af1e/vite/bin/vite.js build
