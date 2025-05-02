@@ -18,6 +18,7 @@ const viteArgs = [
     "--mode", "production",
     "--minify",
 ]
+await FileSystem.ensureIsFolder(targetFolder)
 await FileSystem.remove(`${targetFolder}/index.html`)
 await FileSystem.copy({ from: mainHtmlFilePath, to: `${targetFolder}/index.html`, overwrite: true })
 
@@ -36,7 +37,9 @@ for (let eachPath of jsPaths) {
         const relativePath = eachPath
         const fullPath = `${FileSystem.parentPath(mainHtmlFilePath)}/${eachPath}`
         console.log(`bundling ${relativePath}`)
-        await bundle(fullPath, {outfile: `${targetFolder}/${relativePath}`})
+        const outPath = FileSystem.normalize(`${targetFolder}/${relativePath}`)
+        await FileSystem.ensureIsFolder(FileSystem.parentPath(outPath))
+        await bundle(fullPath, {outfile: outPath})
         console.log(`bundled ${relativePath}`)
     }
 }
