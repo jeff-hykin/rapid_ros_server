@@ -1,0 +1,71 @@
+{
+  "name": "roslib",
+  "homepage": "https://robotwebtools.github.io",
+  "description": "The standard ROS Javascript Library",
+  "version": "1.4.1",
+  "license": "BSD-2-Clause",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/RosLib.umd.cjs",
+  "module": "./dist/RosLib.js",
+  "exports": {
+    ".": {
+      "import": "./dist/RosLib.js",
+      "require": "./dist/RosLib.umd.cjs"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.10",
+    "eslint": "^9.0.0",
+    "globals": "^16.0.0",
+    "jsdoc": "^4.0.2",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.2.2",
+    "vite": "^6.0.1",
+    "vite-plugin-checker": "^0.9.1",
+    "vite-plugin-dts": "^4.0.2",
+    "vitest": "^3.0.2"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.9.0",
+    "cbor-js": "^0.1.0",
+    "eventemitter3": "^5.0.1",
+    "pngparse": "^2.0.0",
+    "ws": "^8.0.0"
+  },
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "engines": {
+    "node": ">=0.10"
+  },
+  "scripts": {
+    "build": "vite build",
+    "doc": "jsdoc -r -c jsdoc_conf.json -d ./doc .",
+    "lint": "eslint .",
+    "test": "vitest",
+    "prepublishOnly": "npm run test",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RobotWebTools/roslibjs/releases"
+  },
+  "bugs": {
+    "url": "https://github.com/RobotWebTools/roslibjs/issues"
+  },
+  "keywords": [
+    "ROS",
+    "ros",
+    "roslib",
+    "roslibjs",
+    "robot"
+  ],
+  "types": "dist/RosLib.d.ts",
+  "author": "Robot Webtools Team <robot-web-tools@googlegroups.com> (https://robotwebtools.github.io)"
+}

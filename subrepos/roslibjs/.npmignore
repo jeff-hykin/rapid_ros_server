@@ -1,0 +1,10 @@
+*.md
+.github
+.gitignore
+.eslint.config.js
+Gruntfile.js
+bower.json
+examples
+jsdoc_conf.json
+test
+tsconfig.json
