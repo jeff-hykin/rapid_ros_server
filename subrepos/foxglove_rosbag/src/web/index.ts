@@ -1,3 +1,3 @@
 /** @module @foxglove/rosbag/web */
 
-export { default as BlobReader } from "./BlobReader";
+export { default as BlobReader } from "./BlobReader.ts";

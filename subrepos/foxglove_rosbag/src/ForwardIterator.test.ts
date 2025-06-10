@@ -1,5 +1,5 @@
-import { ForwardIterator } from "./ForwardIterator";
-import { consumeMessages, FakeBagReader, generateFixtures } from "./test_support/iterator";
+import { ForwardIterator } from "./ForwardIterator.ts";
+import { consumeMessages, FakeBagReader, generateFixtures } from "./test_support/iterator.ts";
 
 describe("ForwardIterator", () => {
   it("should iterate empty bag", async () => {

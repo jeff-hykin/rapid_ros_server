@@ -1,7 +1,8 @@
-import lz4 from "lz4js";
+import lz4 from "npm:lz4js" /* CHECKME: file(s) didn't exist, assuming npm */;
 
-import { Bag } from "./index";
-import { FileReader } from "./node";
+
+import { Bag } from "./index.ts";
+import { FileReader } from "./node/index.ts";
 
 const bagFilePath = "/Users/roman/Downloads/nuScenes-v1.0-mini-scene-0061.bag";
 

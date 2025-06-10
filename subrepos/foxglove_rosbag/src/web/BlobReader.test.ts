@@ -7,9 +7,10 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import { TextEncoder, TextDecoder } from "util";
+import { TextEncoder, TextDecoder } from "node:util";
 
-import BlobReader from "./BlobReader";
+
+import BlobReader from "./BlobReader.ts";
 
 // github.com/jsdom/jsdom/issues/2524
 global.TextEncoder = TextEncoder;

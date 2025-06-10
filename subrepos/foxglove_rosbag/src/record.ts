@@ -5,10 +5,11 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import { MessageReader } from "@foxglove/rosmsg-serialization";
-import { Time } from "@foxglove/rostime";
+import { MessageReader } from "npm:@foxglove/rosmsg-serialization";
+import { Time } from "npm:@foxglove/rostime";
 
-import { extractFields, extractTime } from "./fields";
+
+import { extractFields, extractTime } from "./fields.ts";
 
 function readUint32(buff: Uint8Array): number {
   const view = new DataView(buff.buffer, buff.byteOffset, buff.byteLength);

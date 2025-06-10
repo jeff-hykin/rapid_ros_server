@@ -7,14 +7,15 @@
 
 /* eslint-disable jest/no-conditional-expect */
 
-import { compare, fromDate } from "@foxglove/rostime";
-import compress from "compressjs";
-import fs from "fs";
-import lz4 from "lz4js";
+import { compare, fromDate } from "npm:@foxglove/rostime";
+import compress from "npm:compressjs" /* CHECKME: file(s) didn't exist, assuming npm */;
+import fs from "node:fs";
+import lz4 from "npm:lz4js" /* CHECKME: file(s) didn't exist, assuming npm */;
 
-import Bag, { ReadOptions } from "./Bag";
-import ReadResult from "./ReadResult";
-import FileReader from "./node/FileReader";
+
+import Bag, { ReadOptions } from "./Bag.ts";
+import ReadResult from "./ReadResult.ts";
+import FileReader from "./node/FileReader.ts";
 
 const FILENAME = "example";
 

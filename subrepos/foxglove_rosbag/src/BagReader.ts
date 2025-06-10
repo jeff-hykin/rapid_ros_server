@@ -5,12 +5,13 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import { compare, isGreaterThan, Time } from "@foxglove/rostime";
+import { compare, isGreaterThan, Time } from "npm:@foxglove/rostime";
 
-import { extractFields } from "./fields";
-import nmerge from "./nmerge";
-import { Record, BagHeader, Chunk, ChunkInfo, Connection, IndexData, MessageData } from "./record";
-import type { Filelike, Constructor, Decompress, ChunkReadResult } from "./types";
+
+import { extractFields } from "./fields.ts";
+import nmerge from "./nmerge.ts";
+import { Record, BagHeader, Chunk, ChunkInfo, Connection, IndexData, MessageData } from "./record.ts";
+import type { Filelike, Constructor, Decompress, ChunkReadResult } from "./types.ts";
 
 // Use little endian to read values in dataview
 const LITTLE_ENDIAN = true;

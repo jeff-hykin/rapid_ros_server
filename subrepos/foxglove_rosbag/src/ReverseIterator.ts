@@ -1,9 +1,10 @@
-import { compare, subtract as subTime } from "@foxglove/rostime";
-import Heap from "heap";
+import { compare, subtract as subTime } from "npm:@foxglove/rostime";
+import Heap from "npm:heap" /* CHECKME: file(s) didn't exist, assuming npm */;
 
-import { BaseIterator } from "./BaseIterator";
-import { ChunkInfo } from "./record";
-import { ChunkReadResult, IteratorConstructorArgs } from "./types";
+
+import { BaseIterator } from "./BaseIterator.ts";
+import { ChunkInfo } from "./record.ts";
+import { ChunkReadResult, IteratorConstructorArgs } from "./types.ts";
 
 export class ReverseIterator extends BaseIterator {
   private remainingChunkInfos: (ChunkInfo | undefined)[];

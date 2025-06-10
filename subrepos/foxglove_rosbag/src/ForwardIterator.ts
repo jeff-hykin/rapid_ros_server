@@ -1,9 +1,10 @@
-import { compare, add as addTime } from "@foxglove/rostime";
-import Heap from "heap";
+import { compare, add as addTime } from "npm:@foxglove/rostime";
+import Heap from "npm:heap" /* CHECKME: file(s) didn't exist, assuming npm */;
 
-import { BaseIterator } from "./BaseIterator";
-import { ChunkInfo } from "./record";
-import { IteratorConstructorArgs, ChunkReadResult } from "./types";
+
+import { BaseIterator } from "./BaseIterator.ts";
+import { ChunkInfo } from "./record.ts";
+import { IteratorConstructorArgs, ChunkReadResult } from "./types.ts";
 
 export class ForwardIterator extends BaseIterator {
   private remainingChunkInfos: (ChunkInfo | undefined)[];

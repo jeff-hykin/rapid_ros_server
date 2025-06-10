@@ -5,16 +5,17 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import { parse as parseMessageDefinition } from "@foxglove/rosmsg";
-import { MessageReader } from "@foxglove/rosmsg-serialization";
-import { compare, Time } from "@foxglove/rostime";
+import { parse as parseMessageDefinition } from "npm:@foxglove/rosmsg";
+import { MessageReader } from "npm:@foxglove/rosmsg-serialization";
+import { compare, Time } from "npm:@foxglove/rostime";
 
-import BagReader from "./BagReader";
-import { ForwardIterator } from "./ForwardIterator";
-import ReadResult from "./ReadResult";
-import { ReverseIterator } from "./ReverseIterator";
-import { BagHeader, ChunkInfo, Connection, MessageData } from "./record";
-import { Filelike, Decompress, MessageIterator, IteratorConstructorArgs } from "./types";
+
+import BagReader from "./BagReader.ts";
+import { ForwardIterator } from "./ForwardIterator.ts";
+import ReadResult from "./ReadResult.ts";
+import { ReverseIterator } from "./ReverseIterator.ts";
+import { BagHeader, ChunkInfo, Connection, MessageData } from "./record.ts";
+import { Filelike, Decompress, MessageIterator, IteratorConstructorArgs } from "./types.ts";
 
 export type ReadOptions = {
   decompress?: Decompress;

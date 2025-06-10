@@ -5,9 +5,10 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import * as fs from "fs/promises";
+import * as fs from "node:fs/promises";
 
-import { Filelike } from "../types";
+
+import { Filelike } from "../types.ts";
 
 // reader using nodejs fs api
 export default class FileReader implements Filelike {

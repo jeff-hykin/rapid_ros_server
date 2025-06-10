@@ -1,6 +1,6 @@
-import { IBagReader } from "../IBagReader";
-import { ChunkInfo, Connection, IndexData, Record } from "../record";
-import { ChunkReadResult, Constructor, MessageEvent, MessageIterator } from "../types";
+import { IBagReader } from "../IBagReader.ts";
+import { ChunkInfo, Connection, IndexData, Record } from "../record.ts";
+import { ChunkReadResult, Constructor, MessageEvent, MessageIterator } from "../types.ts";
 
 export type EnhancedChunkInfo = ChunkInfo & {
   messages: FixtureMessage[];

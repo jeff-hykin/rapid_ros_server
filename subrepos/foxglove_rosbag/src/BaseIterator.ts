@@ -1,15 +1,16 @@
-import type { Time } from "@foxglove/rostime";
-import Heap from "heap";
+import type { Time } from "npm:@foxglove/rostime";
+import Heap from "npm:heap" /* CHECKME: file(s) didn't exist, assuming npm */;
 
-import { IBagReader } from "./IBagReader";
-import { ChunkInfo, Connection, MessageData } from "./record";
+
+import { IBagReader } from "./IBagReader.ts";
+import { ChunkInfo, Connection, MessageData } from "./record.ts";
 import type {
   ChunkReadResult,
   Decompress,
   IteratorConstructorArgs,
   MessageEvent,
   MessageIterator,
-} from "./types";
+} from "./types.ts";
 
 type HeapItem = { time: Time; offset: number; chunkReadResult: ChunkReadResult };
 

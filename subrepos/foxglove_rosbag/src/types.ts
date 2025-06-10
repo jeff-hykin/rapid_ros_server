@@ -5,10 +5,11 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import type { Time } from "@foxglove/rostime";
+import type { Time } from "npm:@foxglove/rostime";
 
-import type { IBagReader } from "./IBagReader";
-import type { Chunk, ChunkInfo, Connection, IndexData } from "./record";
+
+import type { IBagReader } from "./IBagReader.ts";
+import type { Chunk, ChunkInfo, Connection, IndexData } from "./record.ts";
 
 export type RawFields = { [k: string]: Uint8Array };
 
