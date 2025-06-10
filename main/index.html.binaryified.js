@@ -1646,7 +1646,31 @@ let output = `<!DOCTYPE html>
         </script>
         <!-- HEADER INJECTION HERE -->
     </head>
-    <!-- BODY INJECTION HERE -->
+    <script>
+        window.mainRosConnection = {
+            rosIpAddress: "localhost"/* AUTOREPLACE:rosIpAddress */,
+            rosPort: 9093/* AUTOREPLACE:rosPort */,
+        }
+        const url = \`wss://\${window.mainRosConnection.rosIpAddress}:\${window.mainRosConnection.rosPort}\`
+        console.log(\`Attempting to connect to: \${url}\`)
+        window.mainRosConnection.ros = new ROSLIB.Ros({ url: url,})
+        window.mainRosConnection.onConnect = function () {}
+        window.mainRosConnection.onError = function () {}
+        window.mainRosConnection.onClose = function () {}
+        
+        window.mainRosConnection.ros.on("connection", function (...args) {
+            window.mainRosConnection.onConnect(...args)
+        })
+        window.mainRosConnection.ros.on("error", function (...args) {
+            window.mainRosConnection.onError(...args)
+        })
+        window.mainRosConnection.ros.on("close", function (...args) {
+            window.mainRosConnection.onClose(...args)
+        })
+    </script>
+    <body>
+        <!-- BODY INJECTION HERE -->
+    </body>
 </html>`
 const relativePathToOriginal = "index.html"
 try {
