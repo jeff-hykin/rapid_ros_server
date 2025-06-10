@@ -4,17 +4,18 @@ import { deferredPromise } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/s
 const { console } = globalThis
 
 export class RosConnector {
-    constructor({ipAddress, port, onConnect, onError, onClose, topicsToSubscribeTo, topicsToPublishTo }) {
+    constructor({ipAddress, port, onConnect, onError, onClose, topicsToSubscribeTo, topicsToPublishTo, secure=false }) {
         this.ros = null
         this.ipAddress = ipAddress
         this.port = port
         this.onConnect = onConnect || function () {}
-        this.onError = onError || function () {}
+        this.onError = onError || console.error
         this.onClose = onClose || function () {}
         this.setupStack = new Error().stack
         this.topicsToSubscribeTo = topicsToSubscribeTo || []
         this.publishableTopics = []
         this.connectionPromise = deferredPromise()
+        this.secure = secure
         
         // 
         // setup
@@ -23,7 +24,7 @@ export class RosConnector {
             url: this.url,
         })
         
-        this.ros.on("connection", async function (...args) {
+        this.ros.on("connection", async  (...args) => {
             this.connectionPromise.resolve()
             try {
                 await this.onConnect(...args)
@@ -36,16 +37,17 @@ export class RosConnector {
             }
         })
 
-        this.ros.on("error", async function (...args) {
-            this.connectionPromise.reject()
+        this.ros.on("error", async  (...args) => {
+            // this.connectionPromise.reject()
             try {
+                console.debug(`error args is:`,args)
                 await this.onError(...args)
             } catch (error) {
                 console.error(`${error?.stack}\n\nWhich came from the onError of ${this.setupStack}`)
             }
         })
 
-        this.ros.on("close", async function () {
+        this.ros.on("close", async  (...args) => {
             this.connectionPromise = deferredPromise() // reset
             try {
                 await this.onClose(...args)
@@ -79,7 +81,10 @@ export class RosConnector {
         return `${this.ipAddress}:${this.port}`
     }
     get url() {
-        return `wss://${this.ipAddress}:${this.port}`
+        if (this.secure) {
+            return `wss://${this.ipAddress}:${this.port}`
+        }
+        return `ws://${this.ipAddress}:${this.port}`
     }
     registerPublishableTopic({name, messageType, ...otherData}) {
         const topic = new Topic({
