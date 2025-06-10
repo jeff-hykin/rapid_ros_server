@@ -9,6 +9,22 @@ import storageObject from "https://esm.sh/gh/jeff-hykin/storage-object@0.0.3.5/m
 import { createSignal } from "./tools/solid_help.js"
 import html from "./tools/solid_help.js"
 
+// const rosC = new RosConnector({
+//     ipAddress: "localhost",
+//     port: 9093,
+//     // onConnect: ,
+//     // onError: ,
+//     // onClose: ,
+//     topicsToSubscribeTo: [],
+//     topicsToPublishTo: [],
+//     .../*PARAMETERS START*/{
+//         port: 9093,
+//         topicsToSubscribeTo: [],
+//     }/*PARAMETERS END*/
+// })
+
+// rosC.getAllTopics()
+
 document.body = html`
     <body font-size=15px background-color=whitesmoke overflow=scroll width=100vw>
         ${Column({ children: html`
