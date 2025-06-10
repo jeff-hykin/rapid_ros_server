@@ -5,7 +5,8 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import { parse as parseMessageDefinition } from "https://esm.sh/@foxglove/rosmsg";
+import rosmsg from "https://esm.sh/@foxglove/rosmsg@5.0.4";
+const parseMessageDefinition = rosmsg.parse
 import { MessageReader } from "https://esm.sh/@foxglove/rosmsg-serialization";
 import { compare, Time } from "https://esm.sh/@foxglove/rostime";
 
