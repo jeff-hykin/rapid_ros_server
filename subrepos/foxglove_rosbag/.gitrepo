@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:foxglove/rosbag.git
+	branch = main
+	commit = 6c002ea36d55111916d91acb6fee4adac623167b
+	parent = 4456a7339e91e948f7409d030d9996cbe885d1dc
+	method = merge
+	cmdver = 0.4.5
