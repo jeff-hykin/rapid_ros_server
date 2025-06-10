@@ -6,8 +6,8 @@ import { createCssClass, removeAllChildElements } from "https://esm.sh/gh/jeff-h
 import { zip, enumerate, count, permute, combinations, wrapAroundGet } from "https://esm.sh/gh/jeff-hykin/good-js@1.13.5.1/source/array.js"
 import storageObject from "https://esm.sh/gh/jeff-hykin/storage-object@0.0.3.5/main.js"
 
-import { createSignal } from "./tools/solid_help.js"
-import html from "./tools/solid_help.js"
+import { createSignal } from "../tools/solid_help.js"
+import html from "../tools/solid_help.js"
 import { RosConnector } from "./main/ros_connector_no_ui.js"
 
 const rosC = new RosConnector({
