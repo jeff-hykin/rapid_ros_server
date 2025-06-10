@@ -6,7 +6,8 @@ import { FileSystem, glob } from "https://deno.land/x/quickr@0.7.6/main/file_sys
 import { Console, clearAnsiStylesFrom, black, white, red, green, blue, yellow, cyan, magenta, lightBlack, lightWhite, lightRed, lightGreen, lightBlue, lightYellow, lightMagenta, lightCyan, blackBackground, whiteBackground, redBackground, greenBackground, blueBackground, yellowBackground, magentaBackground, cyanBackground, lightBlackBackground, lightRedBackground, lightGreenBackground, lightYellowBackground, lightBlueBackground, lightMagentaBackground, lightCyanBackground, lightWhiteBackground, bold, reset, dim, italic, underline, inverse, strikethrough, gray, grey, lightGray, lightGrey, grayBackground, greyBackground, lightGrayBackground, lightGreyBackground, } from "https://deno.land/x/quickr@0.7.6/main/console.js"
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts"
 
-import archy from "https://deno.land/x/archaeopteryx@1.0.8/mod.ts"
+// import archy from "https://deno.land/x/archaeopteryx@1.0.8/mod.ts"
+import archy from "/Users/jeffhykin/repos/archaeopteryx/mod.ts"
 import * as yaml from "https://deno.land/std@0.168.0/encoding/yaml.ts"
 
 import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/parse_args.js"
@@ -20,7 +21,7 @@ const argsInfo = parseArgs({
         [["--help"], flag, ],
         [["--html"], initialValue(`./index.html`), (str)=>str],
         [["--watch-path"], initialValue(null), (str)=>str],
-        [["--port"], initialValue(`8080`), (str)=>str],
+        [["--port"], initialValue(`8081`), (str)=>str],
         [["--ros-js-port"], required, (str)=>str],
         [["--address"], initialValue(`localhost`), (str)=>str],
     ],
@@ -44,8 +45,8 @@ if (args.help) {
 Usage: rrs [options]
 
 Examples:
-    rrs --html index.html --port 8080
-    rrs --html index.html --port 8080 --address 0.0.0.0
+    rrs --html index.html --port 8081
+    rrs --html index.html --port 8081 --address 0.0.0.0
 
 Options:
     --debug, -d
@@ -57,7 +58,7 @@ Options:
 
     --port
         The port to run the server on
-        default: 8080
+        default: 8081
 
     --address
         The address to run the server on
@@ -65,69 +66,9 @@ Options:
 `)
 }
 
-// 
-// setup certificates
-// 
-const certFilePath = Deno.makeTempFileSync()
-const certFileContents = `-----BEGIN CERTIFICATE-----
-MIIEFzCCAv+gAwIBAgIUQb4rDc2cK6W11JPhOPXjBjot94swDQYJKoZIhvcNAQEL
-BQAwgZoxCzAJBgNVBAYTAlVTMQ4wDAYDVQQIDAVUZXhhczEYMBYGA1UEBwwPQ29s
-bGVnZSBTdGF0aW9uMQ0wCwYDVQQKDARUQU1VMREwDwYDVQQLDAhDU0NFIDYzNTES
-MBAGA1UEAwwJMTI3LjAuMC4xMSswKQYJKoZIhvcNAQkBFhx5YXNoYXMuc2FsYW5r
-aW1hdHRAZ21haWwuY29tMB4XDTIzMDIwNzAyNDEyMFoXDTMzMDIwNDAyNDEyMFow
-gZoxCzAJBgNVBAYTAlVTMQ4wDAYDVQQIDAVUZXhhczEYMBYGA1UEBwwPQ29sbGVn
-ZSBTdGF0aW9uMQ0wCwYDVQQKDARUQU1VMREwDwYDVQQLDAhDU0NFIDYzNTESMBAG
-A1UEAwwJMTI3LjAuMC4xMSswKQYJKoZIhvcNAQkBFhx5YXNoYXMuc2FsYW5raW1h
-dHRAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuqlF
-v0ORgfHAIsARLoexMLdmTbIMqkdzcv443RMu3MUhrS6EA3c9mENTskAqSxxu4zPG
-JR0yEVBmiJVLmr5eAwvNx+JXORsbIJ9sHzPQHmv/eFnIS+9QhasSThXV0Ni5iXME
-5QMsX6Rva5Fm7GICLH5u1+veXLMatN7RsqrLEWaC9J7qqwDPcqc093MyhyNhtKtd
-lt2Ph9+ryuOb0Uflx3K/3SKdpFIsou5jr7y/YJFMEGYIZRP8+dkcQr8e0jZBPmn9
-dlu//hJd2F2wp+NEHWX+TCboi8iIFXRH4cjNOa89WpmOO6Gh2pzkjWLSuMsVtvMg
-x/bfuKbbDZXr9jYpGQIDAQABo1MwUTAdBgNVHQ4EFgQUgpdHXRlBoZNV36zTdVAW
-EciUvU8wHwYDVR0jBBgwFoAUgpdHXRlBoZNV36zTdVAWEciUvU8wDwYDVR0TAQH/
-BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAepw5bo75lAEncZNaP2gKd03YYJ1Y
-EOHJlwe4yYl7fSMwEDP7SvpEQ1uQqmDAxQntoQhQXqptfwaU2GVttkZioXOC4D3+
-EODwWQx5VI1rnLxC/g9jhxbyNJvVplaBYwjH1yx6rO/8bPzaN4Qs2MLfiGRBGQBs
-Dhp19CIPpboVRiRSGfcn0bvEfQIGNl4ABH+h0bFHp0vEtioAp7o+XJ72xj2ojjcP
-KbFYuQtxbcSB2lv2Tj++EJzAwg5woIcbXREpKOrurQjF1Y679p5kUPmB77a14fHA
-lakwyzfcPycR32PISk12f0sfQxvfSDFrdChp009q5RtPMoR287Ks8iHyig==
------END CERTIFICATE-----
-`
-await FileSystem.write({ data: certFileContents, path: certFilePath })
-const keyFilePath = Deno.makeTempFileSync()
-const keyFileContents = `-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC6qUW/Q5GB8cAi
-wBEuh7Ewt2ZNsgyqR3Ny/jjdEy7cxSGtLoQDdz2YQ1OyQCpLHG7jM8YlHTIRUGaI
-lUuavl4DC83H4lc5Gxsgn2wfM9Aea/94WchL71CFqxJOFdXQ2LmJcwTlAyxfpG9r
-kWbsYgIsfm7X695csxq03tGyqssRZoL0nuqrAM9ypzT3czKHI2G0q12W3Y+H36vK
-45vRR+XHcr/dIp2kUiyi7mOvvL9gkUwQZghlE/z52RxCvx7SNkE+af12W7/+El3Y
-XbCn40QdZf5MJuiLyIgVdEfhyM05rz1amY47oaHanOSNYtK4yxW28yDH9t+4ptsN
-lev2NikZAgMBAAECggEBAJQTsMb4PThOpdNrdrXo40H4W+oK800p/YYd8tI+Y5Cz
-ufF+0y9EqtJdpsnjaSnI1pba/bd3n75of86eUSnjFwVnmcmV3wfoXu7USZu/KLzZ
-hALfhqvmn4RKn+zeGY7iPt2xJxLeH5eIBPPal0GyxnKxohEchnwXgXo2wTfxkcKs
-qKUbHtDnk8yhgr2oc3wVN3E7s2N4SAlDjwYhoLVjhUsgqZHEsALKO+0/Nrn2Ybdr
-VeApVN7+jO9BS53Pk1JYmuES6bvN4Lqj7mWPDpPh1Gi/biP+33msnB7/iI9LGJu7
-82YsiVMNKb+PdUoRBFDR80/VY1beX54Tul7iU55SMnkCgYEA9n1RRvlRHVx5kkbJ
-xlPPF8/kxCVF/C8REUeppImxt+hFk4VjBXVKzFyVyw+W/8bbEJrgBHXDHbrhsZu3
-usm29FRKUw4+Knynutn4/VPcV1jJjNdTTkSymYcr7xmjFpQnpoiKCjQJNpX9IAgm
-6oOavKHWyXKYiP7UU+Bssraz8QcCgYEAwd0BVk7ZcCSg9ZDEmP8kGDpM6fIcWXFP
-nJABiFERtbFfl39MAk8QNMxXxOMCnz2gnohtAY9R6pJ6Dngi7h92mT0OHMnKWH6M
-KghcvhtysMznaXjwJRfTEIsX8iGteCMPWUeMUpCg6fgv/PZCMDAdpVjIdaT9y8SH
-yfuIhU0mLN8CgYABIdA2wDxkIyGXz2Vr2MSxuk21rOomX1z3tFmOHOfJDXMMW2d6
-BfDjAWXaueaapCIrcFqpCpVr1Ijm1O1CGV0SwDRbL0yPy2TF0ex31WPEru62C+Mh
-D+W2GM3V2ktKdkG8XRItO9HzAztXY1Iyb4pNZXzkDfevYWQ+QmCdbYNkDwKBgQCg
-gU4+GwJDqs/pAHcFBRjpRjuv5dg65Wm4gjICnrw+5h/y2l4f+z27uQNh62GcXfXB
-y8oUZIi54ZRUrnqdFEepD7fDdf6lzgBWPJ4sd6U5ZCykUpDg5RzGsaKdwexRbxWi
-IW64XS4dCHMSyQB7zRp+b0dov7WxI4IZZLvfQcS9mQKBgFNAjNfGwejl8le39Dqe
-yXjMbfg7J24nv8dOMWAIQCN5QxOflZYIucBRgXFPN/eQXXVqw8OAmMCNCPuxQihV
-FnFjKvQ4hCeCUxUL24yWNJzZ4HEFo0WwDyVPnsa98mkJgkZKaRk5k6FbByAZ3w4d
-zBG38Q8YwfFN/k419qnKkT2E
------END PRIVATE KEY-----
-`
-await FileSystem.write({ data: keyFileContents, path: keyFilePath })
+import { certFileContents, keyFileContents } from "./main/dummyCertFiles.js"
 
-let ipAddress
+let ipAddress = args.address
 if (!args.address) {
     const ipAddresses = Deno.networkInterfaces().filter((each)=>each.family=="IPv4").map((each)=>each.address).filter(each=>each!="127.0.0.1").slice(0,1)
     ipAddress = ipAddresses[0]
@@ -136,10 +77,11 @@ if (!args.address) {
 const [folders, name, ext ] = FileSystem.pathPieces(FileSystem.makeAbsolutePath(args.html))
 const actualHtmlPath = FileSystem.join(...folders, `${name}.ignore.html`)
 
-const pathsToWatch = [ args.html, certFilePath, keyFilePath, [ args.watchPath ].filter(each=>each) ]
-let server
-const watcher = Deno.watchFs(pathsToWatch, { recursive: true })
+const pathsToWatch = [ args.html, [ args.watchPath ].filter(each=>each) ]
+const watcher = Deno.watchFs(...pathsToWatch, { recursive: true })
 const updateInfo = async ()=>{
+    // TODO: fix all this HTML stuff later
+
     let htmlFile
     try {
         htmlFile = await FileSystem.read(args.html)
@@ -148,13 +90,6 @@ const updateInfo = async ()=>{
         return
     }
 
-    if (server) {
-        try {
-            await server.close()
-        } catch (error) {
-        }
-    }
-    
     try {
         var document = new DOMParser().parseFromString(
             FileSystem.sync.read(args.html),
@@ -177,18 +112,39 @@ const updateInfo = async ()=>{
             /"localhost"\/\* AUTOREPLACE:rosIpAddress \*\//, `"${ipAddress}"`
         ).replace(/9093\/\* AUTOREPLACE:rosPort \*\//, `${args.rosJsPort}`),
     })
-    server = await archy({
-        port: args.port,
-        secure: true,
-        certFile: certFilePath,
-        keyFile: keyFilePath,
-        hostname: ipAddress,
-        root: FileSystem.parentPath(args.html),
-        allowAbsolute: true,
-    })
-    console.log(`Running on http://${ipAddress}:${args.port}/`)
 }
 updateInfo()
+
+// 
+// tiny secure file server
+// 
+Deno.serve({
+    port: args.port-0,
+    hostname: ipAddress,
+    cert: certFileContents,
+    key: keyFileContents,
+    onListen: () => {
+        console.log(`Running on http://${ipAddress}:${args.port}/`)
+    },
+}, (req) => {
+    const path = "."+new URL(req.url).pathname
+    try {
+        return new Response(Deno.readFileSync(path == "./" ? "./index.html" : path), {
+            status: 200,
+            headers: {
+                "content-type": path.endsWith(".js") ? "text/javascript" : "text/html",
+            },
+        })
+    } catch (error) {
+        return new Response(error.message, {
+            status: 500,
+            headers: {
+                "content-type": "text/plain",
+            },
+        })
+    }
+})
+
 for await (const event of watcher) {
     if (event.kind === 'modify') {
         updateInfo()

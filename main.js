@@ -8,22 +8,33 @@ import storageObject from "https://esm.sh/gh/jeff-hykin/storage-object@0.0.3.5/m
 
 import { createSignal } from "./tools/solid_help.js"
 import html from "./tools/solid_help.js"
+import { RosConnector } from "./main/ros_connector_no_ui.js"
 
-// const rosC = new RosConnector({
-//     ipAddress: "localhost",
-//     port: 9093,
-//     // onConnect: ,
-//     // onError: ,
-//     // onClose: ,
-//     topicsToSubscribeTo: [],
-//     topicsToPublishTo: [],
-//     .../*PARAMETERS START*/{
-//         port: 9093,
-//         topicsToSubscribeTo: [],
-//     }/*PARAMETERS END*/
-// })
+const rosC = new RosConnector({
+    ipAddress: "127.0.0.1",
+    port: 9093,
+    // onConnect: ,
+    // onError: ,
+    // onClose: ,
+    topicsToSubscribeTo: [],
+    topicsToPublishTo: [],
+    .../*PARAMETERS START*/{
+        port: 9093,
+        topicsToSubscribeTo: [
+            {
+                name: "/clock",
+                messageType: "rosgraph_msgs/Clock",
+                callback: (data)=>{
+                    console.log(`got clock message`,data)
+                }
+            }
+        ],
+    }/*PARAMETERS END*/
+})
 
-// rosC.getAllTopics()
+window.rosC = rosC
+
+rosC.getAllTopics()
 
 document.body = html`
     <body font-size=15px background-color=whitesmoke overflow=scroll width=100vw>
