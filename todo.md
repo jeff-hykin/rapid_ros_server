@@ -1,0 +1,3 @@
+- get secure websockets working
+- get tutorial working for auto-setup of secure websockets
+- be able to select which topics to track on the frontend (toggles/rates)
