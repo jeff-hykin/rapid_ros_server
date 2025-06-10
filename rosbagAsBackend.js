@@ -124,7 +124,6 @@ let subscribers = []
     const playbackSpeed = 0.001
     let prevFakeTime = null
     let prevRealTime = 0
-    console.log(`here`)
     // TODO: to be more efficient, there should be some batching+lookahead here
     for await (const item of bag.messageIterator({ topics: topicNames })) {
         const { topic, connectionId, timestamp, data, message } = item
@@ -143,10 +142,10 @@ let subscribers = []
                 await new Promise((r) => setTimeout(r, desiredTimeGap))
             }
         }
-
+        
         console.log(`sending message of ${topic}`)
         for (const each of subscribers) {
-            // FIXME: needs to have an op
+            // FIXME: ensure these are always encoded correctly (how are services handled?)
             each.send(
                 rosEncode({
                     op: "publish",
