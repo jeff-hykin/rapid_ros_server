@@ -1,4 +1,5 @@
-import * as ROSLIB from "../subrepos/roslibjs/src/RosLib.js"
+import { Ros, Topic, Param, Service, Action } from "../subrepos/roslibjs/src/core/index.js"
+import { didYouMean } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/flattened/did_you_mean.js'
 const { console } = globalThis
 
 export class RosConnector {
@@ -15,15 +16,11 @@ export class RosConnector {
         this.topicsToSubscribeTo = topicsToSubscribeTo || []
         this.topics = []
         this.subscriptions = []
-    }
-    get baseValue() {
-        return `${this.ipAddress}:${this.port}`
-    }
-    get url() {
-        return `wss://${this.ipAddress}:${this.port}`
-    }
-    setup() {
-        this.ros = new ROSLIB.Ros({
+        
+        // 
+        // setup
+        // 
+        this.ros = new Ros({
             url: this.url,
         })
         
@@ -62,7 +59,7 @@ export class RosConnector {
         })
         
         for (let { name, messageType, ...otherData} of this.topicsToPublishTo) {
-            const topic = new ROSLIB.Topic({
+            const topic = new Topic({
                 ros: this.ros,
                 name,
                 messageType,
@@ -72,7 +69,7 @@ export class RosConnector {
         }
         
         for (let { callback, name, messageType, ...otherData} of this.topicsToSubscribeTo) {
-            const topic = new ROSLIB.Topic({
+            const topic = new Topic({
                 ros: this.ros,
                 name,
                 messageType,
@@ -80,6 +77,31 @@ export class RosConnector {
             })
             this.topics.push(topic)
             topic.subscribe(callback)
+        }
+    }
+    get baseValue() {
+        return `${this.ipAddress}:${this.port}`
+    }
+    get url() {
+        return `wss://${this.ipAddress}:${this.port}`
+    }
+    publishTo(topicName, {data}) {
+        const topic = this.topics.find(each=>each.name==topicName)
+        if (topic) {
+            topic.publish({data})
+            // ex: 
+            // data: Array.from(
+            //     new Float32Array(
+            //         event.inputBuffer.getChannelData(0)
+            //     )
+            // )
+        } else {
+            didYouMean({
+                givenWord: topicName,
+                possibleWords: this.topics.map(each=>each.name),
+                autoThrow: true,
+                suggestionLimit: 1 
+            })
         }
     }
 }
