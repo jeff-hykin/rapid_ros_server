@@ -5,7 +5,8 @@
 
 import { EventEmitter } from 'https://esm.sh/eventemitter3@5.0.1';
 import Ros from '../core/Ros.js';
-import { GoalStatus } from '../core/GoalStatus.ts';
+// import { GoalStatus } from '../core/GoalStatus.ts';
+import { GoalStatus } from '../core/GoalStatus.js';
 
 /**
  * A ROS 2 action client.
