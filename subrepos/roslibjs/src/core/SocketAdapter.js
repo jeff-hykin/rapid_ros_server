@@ -7,7 +7,7 @@
  * @fileOverview
  */
 
-import CBOR from 'cbor-js';
+import CBOR from 'https://esm.sh/cbor-js@0.1.0';
 import typedArrayTagger from '../util/cborTypedArrayTags.js';
 var BSON = null;
 // @ts-expect-error -- Workarounds for not including BSON in bundle. need to revisit
