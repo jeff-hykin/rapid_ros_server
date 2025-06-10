@@ -3,7 +3,7 @@
  * @author Russell Toris - rctoris@wpi.edu
  */
 
-import { EventEmitter } from 'eventemitter3';
+import { EventEmitter } from 'https://esm.sh/eventemitter3@5.0.1';;
 import Message from '../core/Message.js';
 import ActionClient from './ActionClient.js';
 

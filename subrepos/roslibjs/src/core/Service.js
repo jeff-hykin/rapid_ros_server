@@ -4,7 +4,7 @@
  */
 
 import Ros from './Ros.js';
-import { EventEmitter } from 'eventemitter3';
+import { EventEmitter } from 'https://esm.sh/eventemitter3@5.0.1';;
 
 /**
  * A ROS service client.

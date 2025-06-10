@@ -5,7 +5,7 @@
 
 import Topic from '../core/Topic.js';
 import Ros from '../core/Ros.js';
-import { EventEmitter } from 'eventemitter3';
+import { EventEmitter } from 'https://esm.sh/eventemitter3@5.0.1';
 
 /**
  * An actionlib action server client.

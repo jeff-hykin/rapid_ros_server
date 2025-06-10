@@ -3,7 +3,7 @@
  * @author Brandon Alexander - baalexander@gmail.com
  */
 
-import { EventEmitter } from 'eventemitter3';
+import { EventEmitter } from 'https://esm.sh/eventemitter3@5.0.1';;
 import Ros from './Ros.js';
 
 /**

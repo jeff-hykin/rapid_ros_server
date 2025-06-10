@@ -3,7 +3,7 @@ import Action from '../core/Action.js';
 import Transform from '../math/Transform.js';
 
 import Ros from '../core/Ros.js';
-import {EventEmitter} from 'eventemitter3';
+import {EventEmitter} from 'https://esm.sh/eventemitter3@5.0.1';;
 
 /**
  * A TF Client that listens to TFs from tf2_web_republisher.

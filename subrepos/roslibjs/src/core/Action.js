@@ -3,7 +3,7 @@
  * @author Sebastian Castro - sebastian.castro@picknik.ai
  */
 
-import { EventEmitter } from 'eventemitter3';
+import { EventEmitter } from 'https://esm.sh/eventemitter3@5.0.1';
 import Ros from '../core/Ros.js';
 import { GoalStatus } from '../core/GoalStatus.ts';
 
