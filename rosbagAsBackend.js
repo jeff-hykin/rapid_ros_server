@@ -4,14 +4,83 @@ import FileReader from "./subrepos/foxglove_rosbag/src/node/FileReader.ts"
 import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.1/main/file_system.js"
 import { certFileContents, keyFileContents } from "./main/dummyCertFiles.js"
 
-const bag = new Bag(new FileReader(`${FileSystem.thisFolder}/data.ignore/co_ral_narrow.bag`))
+import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/parse_args.js"
+import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/did_you_mean.js"
+import stringForIndexHtml from "./main/old/index.html.binaryified.js"
+
+const argsInfo = parseArgs({
+    rawArgs: Deno.args,
+    fields: [
+        [["--debug", "-d", ], flag, ],
+        [["--help"], flag, ],
+        [["--bag-file"], initialValue(`${FileSystem.thisFolder}/data.ignore/co_ral_narrow.bag`), (str)=>str],
+        [["--port"], initialValue(`9093`), (str)=>str],
+        [["--address"], initialValue(`127.0.0.1`), (str)=>str],
+        [["--list-topics"], flag, ],
+        [["--dummy-wss"], flag, ],
+    ],
+    namedArgsStopper: "--",
+    allowNameRepeats: true,
+    valueTransformer: JSON.parse,
+    isolateArgsAfterStopper: false,
+    argsByNameSatisfiesNumberedArg: true,
+    implicitNamePattern: /^(--|-)[a-zA-Z0-9\-_]+$/,
+    implictFlagPattern: null,
+})
+didYouMean({
+    givenWords: Object.keys(argsInfo.implicitArgsByName).filter(each=>each.startsWith(`-`)),
+    possibleWords: Object.keys(argsInfo.explicitArgsByName).filter(each=>each.startsWith(`-`)),
+    autoThrow: true,
+    suggestionLimit: 1,
+})
+const args = argsInfo.simplifiedNames
+if (args.help) {
+    console.log(`
+Usage: rrs [options]
+
+Options:
+    --debug, -d
+        Run in debug mode (prints more stuff, maybe)
+    
+    --list-topics
+        List all the topics in the rosbag file, then exit
+
+    --bag-file [path]
+        The path to the rosbag file to serve
+        default: ./data.ignore/co_ral_narrow.bag
+    
+    --port
+        The port to run the server on
+        default: 9093
+
+    --address
+        The address to run the server on
+        default: 127.0.0.1
+    
+    --dummy-wss
+        Use a "secure" websocket connection
+        (self-signed cert/key, not actually secure)
+`)
+}
+
+if (args.debug) {
+    console.log(`Loading rosbag file: ${args.bagFile}`)
+}
+const bag = new Bag(new FileReader(args.bagFile))
 await bag.open()
 // const bag = new Bag(new FileReader(import.meta.resolve("./data.ignore/co_ral_narrow.bag").slice("file://".length)))
     // bag.startTime
     // bag.endTime
     // bag.bagOpt
-const topics = [...bag.connections.values()].map(({ topic, type, messageDefinition, latching }) => ({ topic, type, messageDefinition, latching }))
+const topics = [...bag.connections.values()].map(({ topic, type, messageDefinition, latching }) => ({ topic, type, latching, }))
+// messageDefinition
 const topicNames = topics.map(({ topic }) => topic)
+import * as yaml from "https://deno.land/std@0.168.0/encoding/yaml.ts"
+if (args.listTopics) {
+    console.log(`# the output is valid yaml (e.g. machine parsable/safe)`)
+    console.log(yaml.stringify({topics}))
+    Deno.exit()
+}
 
 import { BSON } from "https://esm.sh/bson@6.10.4"
 import * as CBOR from "https://esm.sh/cbor-js@0.1.0"
@@ -101,12 +170,18 @@ let subscribers = []
     }
 })()
 
+let extras = {}
+if (args.dummyWss) {
+    extras = {
+        cert: certFileContents,
+        key: keyFileContents,
+    }
+}
 Deno.serve(
     {
-        port: 9093,
-        hostname: "127.0.0.1",
-        // cert: certFileContents,
-        // key: keyFileContents,
+        port: args.port-0,
+        hostname: args.address,
+        ...extras,
         // onListen: () => {
         //   console.log(`Running on http://127.0.0.1:9093`)
         // },
@@ -126,6 +201,7 @@ Deno.serve(
             console.log("a client connected!")
         })
         socket.addEventListener("message", (event) => {
+            // TODO: clean up
             if (event.data === "ping") {
                 console.log(`got ping`)
             }
