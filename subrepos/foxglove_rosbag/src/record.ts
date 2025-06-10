@@ -5,9 +5,8 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import { MessageReader } from "npm:@foxglove/rosmsg-serialization";
-import { Time } from "npm:@foxglove/rostime";
-
+import { MessageReader } from "https://esm.sh/@foxglove/rosmsg-serialization";
+import { Time } from "https://esm.sh/@foxglove/rostime";
 
 import { extractFields, extractTime } from "./fields.ts";
 

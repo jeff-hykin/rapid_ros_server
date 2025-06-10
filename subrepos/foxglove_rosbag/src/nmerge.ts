@@ -5,7 +5,7 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import Heap from "npm:heap" /* CHECKME: file(s) didn't exist, assuming npm */;
+import Heap from "https://esm.sh/heap" /* CHECKME: file(s) didn't exist, assuming npm */;
 
 function nmerge<T>(key: (a: T, b: T) => number, ...iterables: Array<Iterator<T>>): Iterator<T> {
   const heap: Heap<{ i: number; value: T }> = new Heap((a, b) => {

@@ -5,10 +5,9 @@
 // found in the LICENSE file in the root directory of this source tree.
 // You may not use this file except in compliance with the License.
 
-import { parse as parseMessageDefinition } from "npm:@foxglove/rosmsg";
-import { MessageReader } from "npm:@foxglove/rosmsg-serialization";
-import { compare, Time } from "npm:@foxglove/rostime";
-
+import { parse as parseMessageDefinition } from "https://esm.sh/@foxglove/rosmsg";
+import { MessageReader } from "https://esm.sh/@foxglove/rosmsg-serialization";
+import { compare, Time } from "https://esm.sh/@foxglove/rostime";
 
 import BagReader from "./BagReader.ts";
 import { ForwardIterator } from "./ForwardIterator.ts";

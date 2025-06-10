@@ -1,5 +1,4 @@
-import lz4 from "npm:lz4js" /* CHECKME: file(s) didn't exist, assuming npm */;
-
+import lz4 from "https://esm.sh/lz4js" /* CHECKME: file(s) didn't exist, assuming npm */;
 
 import { Bag } from "./index.ts";
 import { FileReader } from "./node/index.ts";

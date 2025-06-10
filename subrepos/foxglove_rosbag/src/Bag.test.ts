@@ -7,11 +7,10 @@
 
 /* eslint-disable jest/no-conditional-expect */
 
-import { compare, fromDate } from "npm:@foxglove/rostime";
-import compress from "npm:compressjs" /* CHECKME: file(s) didn't exist, assuming npm */;
+import { compare, fromDate } from "https://esm.sh/@foxglove/rostime";
+import compress from "https://esm.sh/compressjs" /* CHECKME: file(s) didn't exist, assuming npm */;
 import fs from "node:fs";
-import lz4 from "npm:lz4js" /* CHECKME: file(s) didn't exist, assuming npm */;
-
+import lz4 from "https://esm.sh/lz4js" /* CHECKME: file(s) didn't exist, assuming npm */;
 
 import Bag, { ReadOptions } from "./Bag.ts";
 import ReadResult from "./ReadResult.ts";

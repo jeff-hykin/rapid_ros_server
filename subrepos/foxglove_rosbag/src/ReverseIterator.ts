@@ -1,6 +1,5 @@
-import { compare, subtract as subTime } from "npm:@foxglove/rostime";
-import Heap from "npm:heap" /* CHECKME: file(s) didn't exist, assuming npm */;
-
+import { compare, subtract as subTime } from "https://esm.sh/@foxglove/rostime";
+import Heap from "https://esm.sh/heap" /* CHECKME: file(s) didn't exist, assuming npm */;
 
 import { BaseIterator } from "./BaseIterator.ts";
 import { ChunkInfo } from "./record.ts";

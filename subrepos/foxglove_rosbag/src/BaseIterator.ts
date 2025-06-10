@@ -1,6 +1,5 @@
-import type { Time } from "npm:@foxglove/rostime";
-import Heap from "npm:heap" /* CHECKME: file(s) didn't exist, assuming npm */;
-
+import type { Time } from "https://esm.sh/@foxglove/rostime";
+import Heap from "https://esm.sh/heap" /* CHECKME: file(s) didn't exist, assuming npm */;
 
 import { IBagReader } from "./IBagReader.ts";
 import { ChunkInfo, Connection, MessageData } from "./record.ts";
