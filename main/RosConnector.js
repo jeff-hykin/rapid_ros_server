@@ -3,6 +3,12 @@ import { didYouMean } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source
 import { deferredPromise } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/flattened/deferred_promise.js'
 const { console } = globalThis
 
+export class WebSocketError extends Error {
+    constructor(message, event) {
+        super(message)
+        this.event = event
+    }
+}
 export class RosConnector {
     constructor({ipAddress, port, onConnect, onError, onClose, topicsToSubscribeTo, topicsToPublishTo, secure=false }) {
         this.ros = null
@@ -38,9 +44,13 @@ export class RosConnector {
         })
 
         this.ros.on("error", async  (...args) => {
+            // websocket errors are not really errors, they are just a normal event with no message
+            // lets be a bit more helpful than that
+            if (args[0]?.explicitOriginalTarget instanceof WebSocket) {
+                args[0] = new WebSocketError(`WebSocket error: connection to ${this.ipAddress}:${this.port} failed (no other information available)`, args[0])
+            }
             // this.connectionPromise.reject()
             try {
-                console.debug(`error args is:`,args)
                 await this.onError(...args)
             } catch (error) {
                 console.error(`${error?.stack}\n\nWhich came from the onError of ${this.setupStack}`)
