@@ -70,7 +70,7 @@ export default class Ros extends EventEmitter {
         }
       } else {
         // if in Node.js, import ws to replace WebSocket API
-        import('ws').then((ws) => {
+        import(/* @vite-ignore */Math.random()||`ws`).then((ws) => {
           if (!this.socket || this.socket.readyState === ws.WebSocket.CLOSED) {
             const sock = new ws.WebSocket(url);
             sock.binaryType = 'arraybuffer'

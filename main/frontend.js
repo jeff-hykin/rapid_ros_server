@@ -8,7 +8,7 @@ import storageObject from "https://esm.sh/gh/jeff-hykin/storage-object@0.0.3.5/m
 
 import { createSignal } from "../tools/solid_help.js"
 import html from "../tools/solid_help.js"
-import { RosConnector } from "./main/ros_connector_no_ui.js"
+import { RosConnector } from "./RosConnector.js"
 
 const rosC = new RosConnector({
     ipAddress: "127.0.0.1",
