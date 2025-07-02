@@ -9,13 +9,14 @@ import { indent } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/fla
 import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/parse_args.js"
 import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/did_you_mean.js"
 import stringForIndexHtml from "./main/old/index.html.binaryified.js"
+import Yaml from 'https://esm.sh/yaml@2.4.3'
 
 const argsInfo = parseArgs({
     rawArgs: Deno.args,
     fields: [
         [["--debug", "-d", ], flag, ],
         [["--help"], flag, ],
-        [["--bag-file"], initialValue(`${FileSystem.thisFolder}/data.ignore/co_ral_narrow.bag`), (str)=>str],
+        [["--bag-file"], initialValue(null), (str)=>str],
         [["--list-topics"], flag, ],
     ],
     namedArgsStopper: "--",
@@ -48,7 +49,7 @@ Options:
 }
 
 if (args.debug) {
-    console.log(`Loading rosbag file: ${args.bagFile}`)
+    console.log(`# Loading rosbag file: ${args.bagFile}`)
 }
 const bag = new Bag(new FileReader(args.bagFile))
 await bag.open()
@@ -136,6 +137,7 @@ if (true) {
     }))
     console.log(`samples:`)
     for (const [key, value] of Object.entries(samples)) {
-        console.log(`    - ${key}: ${indent({string:JSON.stringify(value, 0,4), by:"        ", noLead:true})}`)
+        // console.log(`    - ${key}: ${}`)
+        console.log(`    - ${key}: ${indent({string:"\n"+Yaml.stringify(value), by:"        ", noLead:true})}`)
     }
 })()
