@@ -1,3 +1,7 @@
+import Bag from "../../subrepos/foxglove_rosbag/src/Bag.ts"
+import FileReader from "../../subrepos/foxglove_rosbag/src/node/FileReader.ts"
+import ArrayReader from "../../subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
+
 function monkeyPatch(object, attrName, createNewFunction) {
     let prevObj = null
     while (!Object.getOwnPropertyNames(object).includes(attrName)) {
@@ -18,9 +22,6 @@ function monkeyPatch(object, attrName, createNewFunction) {
         return innerReplacement.apply(this, args)
     }
 }
-import Bag from "../../subrepos/foxglove_rosbag/src/Bag.ts"
-import FileReader from "../../subrepos/foxglove_rosbag/src/node/FileReader.ts"
-import ArrayReader from "../../subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
 
 export async function loadBag({filePath, array}) {
     let filelike 
