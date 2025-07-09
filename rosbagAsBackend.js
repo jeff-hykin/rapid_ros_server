@@ -116,7 +116,7 @@ function rosEncode(message, compression = "json") {
 
     let rawData
     if (compression == "json") {
-        message = JSON.stringify(message)
+        message = JSON.stringify(message, (_, value) =>typeof value === 'bigint' ? value.toString() : value)
     } else if (compression == "cbor") {
         message = CBOR.encode(message)
     } else if (compression == "bson") {
