@@ -21,6 +21,7 @@ const argsInfo = parseArgs({
         [["--port"], initialValue(`9093`), (str)=>str],
         [["--address"], initialValue(`127.0.0.1`), (str)=>str],
         [["--list-topics"], flag, ],
+        [["--playback-speed", "-s"], initialValue(1), (str)=>parseFloat(str)],
         [["--dummy-wss"], flag, ],
     ],
     namedArgsStopper: "--",
@@ -49,6 +50,10 @@ Options:
     --list-topics
         List all the topics in the rosbag file, then exit
 
+    --playback-speed, -s
+        The relative speed to play back the rosbag file at
+        default: 1
+    
     --bag-file [path]
         The path to the rosbag file to serve
         default: ./data.ignore/co_ral_narrow.bag
@@ -125,7 +130,7 @@ let subscribers = []
 // start sending out messages
 //
 ;(async () => {
-    const playbackSpeed = 0.001
+    const playbackSpeed = args.playbackSpeed
     let prevFakeTime = null
     let prevRealTime = 0
     // TODO: to be more efficient, there should be some batching+lookahead here
@@ -149,6 +154,7 @@ let subscribers = []
         
         // console.log(`sending message of ${topic}`)
         for (const each of subscribers) {
+            console.debug(`publishing item.topic is:`,item.topic)
             // FIXME: ensure these are always encoded correctly (how are services handled?)
             each.send(
                 rosEncode({
