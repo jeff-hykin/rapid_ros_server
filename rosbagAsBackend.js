@@ -59,7 +59,7 @@ Options:
     
     --bag-file [path]
         The path to the rosbag file to serve
-        default: ./data.ignore/co_ral_narrow.bag
+        default: null
     
     --port
         The port to run the server on
@@ -159,7 +159,9 @@ let subscribers = []
             
             // console.log(`sending message of ${topic}`)
             for (const each of subscribers) {
-                console.debug(`publishing item.topic is:`,item.topic)
+                if (args.debug) {
+                    console.debug(`publishing item.topic is:`,item.topic)
+                }
                 // FIXME: ensure these are always encoded correctly (how are services handled?)
                 each.send(
                     rosEncode({
