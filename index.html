@@ -3,11 +3,11 @@
     <title>Web Template</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://unpkg.com/css-baseline/css/3.css">
+    <link rel="stylesheet" href="https://unpkg.com/css-baseline/css/3.css" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto');
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Roboto");
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
         :root {
             --gray-pallet-background: rgb(30, 37, 53);
             --red-pallet-background: lightcoral;
@@ -53,10 +53,10 @@
         }
         .weak-shadow {
             transition: all 0.3s ease-in-out 0s;
-            box-shadow: 0 4px 5px 0 rgba(0,0,0,0.10),0 1px 10px 0 rgba(0,0,0,0.08),0 2px 4px -1px rgba(0,0,0,0.24);
+            box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.1), 0 1px 10px 0 rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.24);
         }
         .weak-shadow:hover {
-            box-shadow: 0 8px 17px 2px rgba(0,0,0,0.10),0 6px 30px 5px rgba(0,0,0,0.08),0 8px 10px -7px rgba(0,0,0,0.16);
+            box-shadow: 0 8px 17px 2px rgba(0, 0, 0, 0.1), 0 6px 30px 5px rgba(0, 0, 0, 0.08), 0 8px 10px -7px rgba(0, 0, 0, 0.16);
         }
         button {
             border-radius: 1em;
@@ -77,28 +77,62 @@
 <!--                                   -->
 <!-- Synchonous/Fast loading animation -->
 <!--                                   -->
-    <body>
-        <div style="display: flex;justify-content: center;align-items: center;height: 100vh;">
-            <div style="width: 50px;height: 50px;border: 10px solid #dddddd;border-top-color: #009579;border-radius: 50%;transform: rotate(0.16turn);" id="good-component--initial-loader">
-            </div>
-        </div>
-    </body>
-    <script>
-        const animateLoader = ()=>{
-            const element = document.getElementById("good-component--initial-loader")
-            element && element.animate(
-                [
-                    { transform: 'rotate(0turn)' },
-                    { transform: 'rotate(1turn)' },
-                ],
-                {
-                    duration: 1000,
-                    iterations: Infinity,
-                    easing: 'ease',
-                },
-            )
-        }
-        document.body ? animateLoader() : document.addEventListener("DOMContentLoaded", animateLoader)
-    </script>
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh">
+        <div style="width: 50px; height: 50px; border: 10px solid #dddddd; border-top-color: #009579; border-radius: 50%; transform: rotate(0.16turn)" id="good-component--initial-loader"></div>
+    </div>
+</body>
+<script>
+    const animateLoader = () => {
+        const element = document.getElementById("good-component--initial-loader")
+        element &&
+            element.animate([{ transform: "rotate(0turn)" }, { transform: "rotate(1turn)" }], {
+                duration: 1000,
+                iterations: Infinity,
+                easing: "ease",
+            })
+    }
+    document.body ? animateLoader() : document.addEventListener("DOMContentLoaded", animateLoader)
+</script>
 
-<script src="./main/frontend.js" type="module"></script>
+<script type="module">
+    // import { Elemental, passAlongProps } from "https://esm.sh/gh/jeff-hykin/elemental@0.6.5/main/deno.js"
+    // import { css, components, Column, Row, askForFiles, Code, Input, Button, Checkbox, Dropdown, popUp, cx, } from "https://esm.sh/gh/jeff-hykin/good-component@0.3.2/elements.js"
+    // import { fadeIn, fadeOut } from "https://esm.sh/gh/jeff-hykin/good-component@0.3.2/main/animations.js"
+    // import { showToast, showErrorToast } from "https://esm.sh/gh/jeff-hykin/good-component@0.3.2/main/actions/show_toast.js" // helpful pop-up tools (google "toast notifiction")
+    // import { createCssClass, removeAllChildElements } from "https://esm.sh/gh/jeff-hykin/good-component@0.3.2/main/helpers.js"
+    // import { zip, enumerate, count, permute, combinations, wrapAroundGet } from "https://esm.sh/gh/jeff-hykin/good-js@1.13.5.1/source/array.js"
+    // import storageObject from "https://esm.sh/gh/jeff-hykin/storage-object@0.0.3.5/main.js"
+
+    // import { toRepresentation } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/flattened/to_representation.js'
+
+    // import { createSignal } from "../tools/solid_help.js"
+    // import html from "../tools/solid_help.js"
+    import { RosConnector } from "./RosConnector.js"
+
+    const rosC = new RosConnector({
+        ipAddress: "127.0.0.1",
+        port: 9093,
+        // onConnect: ,
+        onError: (error)=>{
+            showErrorToast(error?.message || error)
+        },
+        // onClose: ,
+        topicsToSubscribeTo: [],
+        topicsToPublishTo: [],
+    })
+
+    window.rosC = rosC
+
+    rosC.getAllTopics()
+
+    document.body = html`
+        <body font-size=15px background-color=whitesmoke overflow=scroll width=100vw>
+            ${Column({ children: html`
+                <span>Howdy!</span>
+                <span>Howdy!</span>
+                <span>Howdy!</span>
+            `})}
+        </body>
+    `
+</script>

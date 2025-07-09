@@ -2738,7 +2738,7 @@ var Action = class extends export_EventEmitter {
     this.ros.callOnConnection(call);
   }
 };
-export {
+globalThis.ROSLIB = {
   Action,
   Param,
   Ros,
