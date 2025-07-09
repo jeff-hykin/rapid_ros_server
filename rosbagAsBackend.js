@@ -1,9 +1,9 @@
 #!/usr/bin/env -S deno run --allow-all
 import Bag from "./subrepos/foxglove_rosbag/src/Bag.ts"
 import FileReader from "./subrepos/foxglove_rosbag/src/node/FileReader.ts"
+import { certFileContents, keyFileContents } from "./main/dummyCertFiles.js"
 // import ArrayReader from "./subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
 import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.1/main/file_system.js"
-import { certFileContents, keyFileContents } from "./main/dummyCertFiles.js"
 
 import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/parse_args.js"
 import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/did_you_mean.js"
@@ -14,7 +14,7 @@ const argsInfo = parseArgs({
     fields: [
         [["--debug", "-d", ], flag, ],
         [["--help"], flag, ],
-        [["--bag-file"], initialValue(`${FileSystem.thisFolder}/data.ignore/co_ral_narrow.bag`), (str)=>str],
+        [["--bag-file"], initialValue(null), (str)=>str],
         [["--port"], initialValue(`9093`), (str)=>str],
         [["--address"], initialValue(`127.0.0.1`), (str)=>str],
         [["--list-topics"], flag, ],
