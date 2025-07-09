@@ -1,3 +1,4 @@
+#!/usr/bin/env -S deno run --allow-all
 import Bag from "./subrepos/foxglove_rosbag/src/Bag.ts"
 import FileReader from "./subrepos/foxglove_rosbag/src/node/FileReader.ts"
 // import ArrayReader from "./subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
@@ -143,7 +144,7 @@ let subscribers = []
             }
         }
         
-        console.log(`sending message of ${topic}`)
+        // console.log(`sending message of ${topic}`)
         for (const each of subscribers) {
             // FIXME: ensure these are always encoded correctly (how are services handled?)
             each.send(

@@ -55,7 +55,7 @@ const bag = await loadBag({filePath: args.bagFile})
     // bag.topicNames
 if (true) {
     console.log(`# the output is valid yaml (e.g. machine parsable/safe)`)
-    console.log(Yaml.stringify({topics}))
+    console.log(Yaml.stringify({topics: bag.topics}))
 }
 
 //
