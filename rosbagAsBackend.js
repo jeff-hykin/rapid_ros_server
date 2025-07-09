@@ -73,6 +73,7 @@ Options:
         Use a "secure" websocket connection
         (self-signed cert/key, not actually secure)
 `)
+    Deno.exit()
 }
 
 if (args.debug) {
