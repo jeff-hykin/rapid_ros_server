@@ -3,8 +3,8 @@
  * @author Ramon Wijnands - rayman747@hotmail.com
  */
 
-import pngparse from 'pngparse';
-
+// import pngparse from 'pngparse';
+let pngparse
 /**
  * @callback decompressPngCallback
  * @param data - The uncompressed data.
