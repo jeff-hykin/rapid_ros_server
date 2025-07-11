@@ -158,19 +158,19 @@ let subscribers = []
             }
             
             // console.log(`sending message of ${topic}`)
-            for (const each of subscribers) {
-                if (args.debug) {
-                    console.debug(`publishing item.topic is:`,item.topic)
+            if (subscribers.length != 0) {
+                const messageBytes = rosEncode({
+                    op: "publish",
+                    topic: item.topic,
+                    msg: { name: item.topic, timestamp, data: item.message},
+                })
+                for (const each of subscribers) {
+                    if (args.debug) {
+                        console.debug(`publishing item.topic is:`,item.topic)
+                    }
+                    // FIXME: ensure these are always encoded correctly (how are services handled?)
+                    each.send(messageBytes)
                 }
-                // FIXME: ensure these are always encoded correctly (how are services handled?)
-                each.send(
-                    rosEncode({
-                        op: "publish",
-                        topic: item.topic,
-                        timestamp,
-                        msg: item.message,
-                    })
-                )
             }
 
             // {
