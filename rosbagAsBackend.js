@@ -20,6 +20,7 @@ const argsInfo = parseArgs({
         [["--list-topics"], flag, ],
         [["--playback-speed", "-s"], initialValue(1), (str)=>parseFloat(str)],
         [["--no-repeat-on-end", ], flag, initialValue(false)],
+        [["--use-timestamps-as-offsets", ], flag, initialValue(false)],
         [["--dummy-wss"], flag, ],
     ],
     namedArgsStopper: "--",
@@ -129,6 +130,11 @@ function rosEncode(message, compression = "json") {
 }
 
 let subscribers = []
+let startTimeMilliseconds = null
+
+function timestampToMilliseconds({ sec, nsec }) {
+    return (sec * 1000) + nsec / 1000000
+}
 
 //
 // start sending out messages
@@ -142,15 +148,22 @@ let subscribers = []
         for await (const item of bag.messageIterator({ topics: topicNames })) {
             const { topic, connectionId, timestamp, data, message } = item
             const { sec, nsec } = timestamp
+            if (startTimeMilliseconds == null) {
+                if (args.useTimestampsAsOffsets) {
+                    startTimeMilliseconds = Date.now()
+                } else {
+                    startTimeMilliseconds = 0
+                }
+            }
             if (prevFakeTime == null) {
-                prevFakeTime = sec * 1000 + nsec / 1000000
+                prevFakeTime = timestampToMilliseconds(timestamp) + startTimeMilliseconds
                 prevRealTime = performance.now()
             } else {
                 const realTimeGap = performance.now() - prevRealTime
                 prevRealTime = performance.now()
-                const fakeTime = sec * 1000 + nsec / 1000000
+                const fakeTime = timestampToMilliseconds(timestamp) + startTimeMilliseconds
                 const desiredTimeGap = (fakeTime - prevFakeTime) / playbackSpeed
-                prevFakeTime = sec * 1000 + nsec / 1000000
+                prevFakeTime = fakeTime
                 if (prevFakeTime >= 2) {
                     // 2ms is the smallest realistic amount of time
                     await new Promise((r) => setTimeout(r, desiredTimeGap))
