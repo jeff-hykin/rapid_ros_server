@@ -5,7 +5,7 @@ import { certFileContents, keyFileContents } from "./main/dummyCertFiles.js"
 // import ArrayReader from "./subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
 import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.1/main/file_system.js"
 
-import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/parse_args.js"
+import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.18.0.0/source/flattened/parse_args.js"
 import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/did_you_mean.js"
 import stringForIndexHtml from "./main/old/index.html.binaryified.js"
 
@@ -24,7 +24,7 @@ const argsInfo = parseArgs({
         [["--dummy-wss"], flag, ],
     ],
     namedArgsStopper: "--",
-    allowNameRepeats: true,
+    nameRepeats: "useLast",
     valueTransformer: JSON.parse,
     isolateArgsAfterStopper: false,
     argsByNameSatisfiesNumberedArg: true,
@@ -73,6 +73,8 @@ Options:
     --dummy-wss
         Use a "secure" websocket connection
         (self-signed cert/key, not actually secure)
+Notes:
+    - Giving an argument twice will use the last one given
 `)
     Deno.exit()
 }
