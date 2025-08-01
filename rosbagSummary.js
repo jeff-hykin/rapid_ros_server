@@ -82,6 +82,8 @@ if (true) {
     console.log(Yaml.stringify({
         topicCounts,
         timingInfo: {
+            startDate: new Date(firstTimestamp),
+            durationMinutes: (lastTimestamp - firstTimestamp)/60000,
             durationMilliseconds: lastTimestamp - firstTimestamp,
             firstTimestamp,
             lastTimestamp,
