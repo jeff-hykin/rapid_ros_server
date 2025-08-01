@@ -4,6 +4,7 @@ import FileReader from "./subrepos/foxglove_rosbag/src/node/FileReader.ts"
 import { certFileContents, keyFileContents } from "./main/dummyCertFiles.js"
 // import ArrayReader from "./subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
 import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.1/main/file_system.js"
+import { Console } from "https://deno.land/x/quickr@0.8.4/main/console.js"
 
 import { parseArgs, flag, required, initialValue } from "https://raw.githubusercontent.com/jeff-hykin/good-js/1.18.0.0/source/flattened/parse_args.js"
 import { didYouMean } from "https://raw.githubusercontent.com/jeff-hykin/good-js/1.18.0.0/source/flattened/did_you_mean.js"
@@ -20,6 +21,8 @@ const argsInfo = parseArgs({
         [["--playback-speed", "-s"], initialValue(1), (str)=>parseFloat(str)],
         [["--no-repeat-on-end", ], flag, initialValue(false)],
         [["--use-timestamps-as-offsets", ], flag, initialValue(false)],
+        [["--log-function", ], initialValue("null")],
+        [["--fast-forward-function", ], initialValue("null")],
         [["--dummy-wss"], flag, ],
     ],
     namedArgsStopper: "--",
@@ -97,6 +100,10 @@ if (args.listTopics) {
     Deno.exit()
 }
 
+// evaled here so that bag,topics,etc are available
+args.logFunction = eval(args.logFunction)
+args.fastForwardFunction = eval(args.fastForwardFunction)
+
 import { BSON } from "https://esm.sh/bson@6.10.4"
 import * as CBOR from "https://esm.sh/cbor-js@0.1.0"
 function rosEncode(message, compression = "json") {
@@ -155,6 +162,15 @@ function timestampToMilliseconds({ sec, nsec }) {
                 } else {
                     startTimeMilliseconds = 0
                 }
+            }
+            if (args.logFunction) {
+                const logValue = args.logFunction({ ...item, timestamp: timestampToMilliseconds(timestamp) })
+                if (logValue!=null) {
+                    Console.write(`${logValue}\r`)
+                }
+            }
+            if (args.fastForwardFunction && args.fastForwardFunction({ ...item, timestamp: timestampToMilliseconds(timestamp) })) {
+                continue
             }
             if (prevFakeTime == null) {
                 prevFakeTime = timestampToMilliseconds(timestamp) + startTimeMilliseconds
@@ -226,7 +242,6 @@ Deno.serve(
         // },
     },
     (req) => {
-        console.debug(`req is:`, req)
         //
         // asked for something other than websocket
         //
