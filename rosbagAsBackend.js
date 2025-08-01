@@ -18,6 +18,7 @@ const argsInfo = parseArgs({
         [["--port"], initialValue(`9093`), (str)=>str],
         [["--address"], initialValue(`127.0.0.1`), (str)=>str],
         [["--list-topics"], flag, ],
+        [["--topic-whitelist"], initialValue(null), (str)=>str.split(",")],
         [["--playback-speed", "-s"], initialValue(1), (str)=>parseFloat(str)],
         [["--no-repeat-on-end", ], flag, initialValue(false)],
         [["--use-timestamps-as-offsets", ], flag, initialValue(false)],
@@ -51,6 +52,12 @@ Options:
     --list-topics
         List all the topics in the rosbag file, then exit
     
+    --topic-whitelist [topic1,topic2,...]
+        Only read messages from the given topics
+        default: all topics
+        ex:
+            --topic-whitelist /spot/odometry,/spot/status/mobility_params
+    
     --no-repeat-on-end
         By default, the rosbag file will be repeated when it reaches the end
         (i.e. when the rosbag file is over, it will start from the beginning)
@@ -75,6 +82,24 @@ Options:
     --dummy-wss
         Use a "secure" websocket connection
         (self-signed cert/key, not actually secure)
+    
+    --fast-forward-function
+        The sender will skip messages as fast as possible if the function 
+        returns true. This is useful for ignoring start/end conditions.
+        It is a javascript function literal, for example:
+            --fast-forward-function '({message,topic})=>message.position.x<0.5'
+        Here are the available properties on the message object:
+            - message // object
+            - topic // string
+            - timestamp // milliseconds float
+            - connectionId
+            - data // Uint8Array (e.g. raw bytes)
+    
+    --log-function
+        A function that will be called for each non-skipped message.
+        Whatever non-null value is returned will be printed.
+        Example:
+            --log-function '({ message, date, timestamp, topic })=>(topic!="/spot/odometry" ? null : [date,message])'
 Notes:
     - Giving an argument twice will use the last one given
 `)
@@ -153,7 +178,7 @@ function timestampToMilliseconds({ sec, nsec }) {
     let prevRealTime = 0
     while (1) {
         // TODO: to be more efficient, there should be some batching+lookahead here
-        for await (const item of bag.messageIterator({ topics: topicNames })) {
+        for await (const item of bag.messageIterator({ topics: args.topicWhitelist || topicNames })) {
             const { topic, connectionId, timestamp, data, message } = item
             const { sec, nsec } = timestamp
             if (startTimeMilliseconds == null) {
@@ -163,22 +188,24 @@ function timestampToMilliseconds({ sec, nsec }) {
                     startTimeMilliseconds = 0
                 }
             }
+            const timestampMilliseconds = timestampToMilliseconds(timestamp)
+            const date = new Date(timestampMilliseconds)
+            if (args.fastForwardFunction && args.fastForwardFunction({ ...item, date, timestamp: timestampMilliseconds })) {
+                continue
+            }
             if (args.logFunction) {
-                const logValue = args.logFunction({ ...item, timestamp: timestampToMilliseconds(timestamp) })
+                const logValue = args.logFunction({ ...item, date, timestamp: timestampMilliseconds })
                 if (logValue!=null) {
                     Console.write(`${logValue}\r`)
                 }
             }
-            if (args.fastForwardFunction && args.fastForwardFunction({ ...item, timestamp: timestampToMilliseconds(timestamp) })) {
-                continue
-            }
             if (prevFakeTime == null) {
-                prevFakeTime = timestampToMilliseconds(timestamp) + startTimeMilliseconds
+                prevFakeTime = timestampMilliseconds + startTimeMilliseconds
                 prevRealTime = performance.now()
             } else {
                 const realTimeGap = performance.now() - prevRealTime
                 prevRealTime = performance.now()
-                const fakeTime = timestampToMilliseconds(timestamp) + startTimeMilliseconds
+                const fakeTime = timestampMilliseconds + startTimeMilliseconds
                 const desiredTimeGap = (fakeTime - prevFakeTime) / playbackSpeed
                 prevFakeTime = fakeTime
                 if (prevFakeTime >= 2) {
