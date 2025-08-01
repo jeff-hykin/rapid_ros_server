@@ -5,9 +5,8 @@ import { certFileContents, keyFileContents } from "./main/dummyCertFiles.js"
 // import ArrayReader from "./subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
 import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.1/main/file_system.js"
 
-import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.18.0.0/source/flattened/parse_args.js"
-import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/did_you_mean.js"
-import stringForIndexHtml from "./main/old/index.html.binaryified.js"
+import { parseArgs, flag, required, initialValue } from "https://raw.githubusercontent.com/jeff-hykin/good-js/1.18.0.0/source/flattened/parse_args.js"
+import { didYouMean } from "https://raw.githubusercontent.com/jeff-hykin/good-js/1.18.0.0/source/flattened/did_you_mean.js"
 
 const argsInfo = parseArgs({
     rawArgs: Deno.args,
