@@ -9,8 +9,8 @@ import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.43/deno-dom-wasm.ts
 // import archy from "https://deno.land/x/archaeopteryx@1.0.13/mod.ts"
 import * as yaml from "https://deno.land/std@0.168.0/encoding/yaml.ts"
 
-import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/parse_args.js"
-import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/did_you_mean.js"
+import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/parse_args.js"
+import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/did_you_mean.js"
 import stringForIndexHtml from "./main/old/index.html.binaryified.js"
 
 const argsInfo = parseArgs({

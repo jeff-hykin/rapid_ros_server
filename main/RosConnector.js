@@ -1,6 +1,6 @@
 import { Ros, Topic, Param, Service, Action } from "../subrepos/roslibjs/src/core/index.js"
-import { didYouMean } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/flattened/did_you_mean.js'
-import { deferredPromise } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/flattened/deferred_promise.js?target=esnext'
+import { didYouMean } from 'https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/did_you_mean.js'
+import { deferredPromise } from 'https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/deferred_promise.js?target=esnext'
 const { console } = globalThis
 
 export class WebSocketError extends Error {

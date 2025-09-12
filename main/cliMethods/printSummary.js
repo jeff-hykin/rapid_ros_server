@@ -1,5 +1,5 @@
 #!/usr/bin/env -S deno run --allow-all
-import { indent } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/flattened/indent.js'
+import { indent } from 'https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/indent.js'
 import Yaml from 'https://esm.sh/yaml@2.4.3'
 import { timestampToMilliseconds } from "../tools/timestampToMilliseconds.js"
 

@@ -6,10 +6,10 @@ import { loadBag } from "../main/tools/loadBag.js"
 // import ArrayReader from "./subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
 import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.1/main/file_system.js"
 import { certFileContents, keyFileContents } from "../main/dummyCertFiles.js"
-import { indent } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/flattened/indent.js'
+import { indent } from 'https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/indent.js'
 
-import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/parse_args.js"
-import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/did_you_mean.js"
+import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/parse_args.js"
+import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/did_you_mean.js"
 import stringForIndexHtml from "../main/old/index.html.binaryified.js"
 
 const argsInfo = parseArgs({
