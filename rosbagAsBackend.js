@@ -1,26 +1,39 @@
 #!/usr/bin/env -S deno run --allow-all
-import Bag from "./subrepos/foxglove_rosbag/src/Bag.ts"
+import { loadBag } from "./main/tools/loadBag.js"
 import FileReader from "./subrepos/foxglove_rosbag/src/node/FileReader.ts"
 import { certFileContents, keyFileContents } from "./main/dummyCertFiles.js"
 // import ArrayReader from "./subrepos/foxglove_rosbag/src/web/ArrayReader.ts"
-import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.1/main/file_system.js"
-import { Console } from "https://deno.land/x/quickr@0.8.4/main/console.js"
+import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.4/main/file_system.js"
+import { Console, cyan, green, magenta, yellow } from "https://deno.land/x/quickr@0.8.4/main/console.js"
 
 import { parseArgs, flag, required, initialValue } from "https://raw.githubusercontent.com/jeff-hykin/good-js/1.18.0.0/source/flattened/parse_args.js"
 import { didYouMean } from "https://raw.githubusercontent.com/jeff-hykin/good-js/1.18.0.0/source/flattened/did_you_mean.js"
+import Yaml from 'https://esm.sh/yaml@2.4.3'
+
+import { printSummary } from "./main/cliMethods/printSummary.js"
+import { serveRosbag } from "./main/cliMethods/serveRosbag.js"
+
+// todo features:
+    // use write("\r") to print stuff in the loop (formatted time and topic name) Console.width
+    // add --topic-blacklist
+    // add --skip first N messages/time
+    // add --skip last N messages/time
+    // batch/look ahead for faster sending
 
 const argsInfo = parseArgs({
     rawArgs: Deno.args,
     fields: [
         [["--debug", "-d", ], flag, ],
         [["--help"], flag, ],
-        [["--bag-file"], initialValue(null), (str)=>str],
-        [["--port"], initialValue(`9093`), (str)=>str],
+        [["--bag-file", 0], initialValue(null), (str)=>str],
+        [["--summarize", "--summary"], flag, ],
+        [["--config-file"], initialValue(null), (str)=>str],
+        [["--port"], initialValue(`9090`), (str)=>str],
         [["--address"], initialValue(`127.0.0.1`), (str)=>str],
         [["--list-topics"], flag, ],
         [["--topic-whitelist"], initialValue(null), (str)=>str.split(",")],
         [["--playback-speed", "-s"], initialValue(1), (str)=>parseFloat(str)],
-        [["--no-repeat-on-end", ], flag, initialValue(false)],
+        [["--no-repeat-on-end", "--no-repeat" ], flag, initialValue(false)],
         [["--use-timestamps-as-offsets", ], flag, initialValue(false)],
         [["--log-function", ], initialValue("null")],
         [["--fast-forward-function", ], initialValue("null")],
@@ -40,18 +53,106 @@ didYouMean({
     autoThrow: true,
     suggestionLimit: 1,
 })
+const highlightHelp = (string)=>string.replace(
+        // the [value]
+        /(?<=\n    --(?:\w|-)+\s+)\[.+?\]/g, (match)=>`${magenta(match)}`
+    ).replace(
+        // the Notes:
+        /\n\w+:/g, (match)=>`\n${yellow.bold(match)}`
+    ).replace(
+        // the --arg
+        /\n    (--(?:\w|-)+)/g, (match)=>`    ${green(match)}`
+    )
 const args = argsInfo.simplifiedNames
 if (args.help) {
-    console.log(`
-Usage: rrs [options]
+    console.log(highlightHelp(`
+Usage: ${cyan("rrs")} [options]
 
+Examples:
+    ${cyan("rrs")} --list-topics --bag-file 'your_file.bag'
+    
+    ${cyan("rrs")} --summary --bag-file 'your_file.bag'
+    
+    ${cyan("rrs")} --bag-file 'your_file.bag' \
+        --config-file ./package.json
+        # package.json ex: { rbbConfig: { port: 9093 } } 
+    
+    ${cyan("rrs")} --bag-file 'your_file.bag' \
+        --port 9093 \
+        --address 127.0.0.1 \
+        --playback-speed 2 \
+        --topic-whitelist "/my1/topic1,/my2/topic2" \
+        --no-repeat-on-end
+    
+    ${cyan("rrs")} --bag-file 'your_file.bag' \
+        --port 9093 \
+        --address 127.0.0.1 \
+        --no-repeat-on-end \
+        --playback-speed 2 \
+        --topic-whitelist "/my1/topic1,/my2/topic2" \
+        --fast-forward-function '({message,topic,timeMin,date,...other})=>timeMin<0.5' \
+        --log-function '({message,topic,...other})=>[ date.toLocaleString(), topic ]'
+
+    ${cyan("rrs")} --bag-file 'your_file.bag' \
+        --port 9093 \
+        --address 127.0.0.1 \
+        --no-repeat-on-end \
+        --playback-speed 2 \
+        --topic-whitelist "/my1/topic1,/my2/topic2" \
+        --fast-forward-function '({topic,timeMin,...other})=>timeMin<0.5' \
+        --log-function '({message,topic,...other})=>{
+            if (other.timeMin > 3 && other.timeMin < 5) {
+                return null
+            } else {
+                return [ date.toLocaleString(), topic ]
+            }
+        '
 Options:
+    --bag-file [path]
+        The path to the rosbag file to serve
+        default: null
+    
     --debug, -d
         Run in debug mode (prints more stuff, maybe)
-    
+
     --list-topics
         List all the topics in the rosbag file, then exit
     
+    --summarize
+        Print a yaml summary of the rosbag file, then exit
+    
+    --help
+        Print this help message
+    
+    --config-file [file_path]
+        Highly recommended you use this.
+        Use the config file to set port/ipAddress/etc
+        It can be a .json/.yaml file or a .js file 
+        Json example (can be inside a package.json):
+            {
+                "rbbConfig": {
+                    "port": 9093,
+                    "ipAddress": "127.0.0.1",
+                    "noRepeatOnEnd": true,
+                },
+            }
+        Js example:
+            export default {
+                rbbConfig: {
+                    port: 9093,
+                    ipAddress: "127.0.0.1",
+                    playbackSpeed: 4,
+                },
+            }
+    
+    --port [portNumber]
+        The port to run the server on
+        default: 9093
+
+    --address [ipAddress]
+        The address to run the server on
+        default: 127.0.0.1
+
     --topic-whitelist [topic1,topic2,...]
         Only read messages from the given topics
         default: all topics
@@ -63,234 +164,121 @@ Options:
         (i.e. when the rosbag file is over, it will start from the beginning)
         This flag will disable that behavior
 
-    --playback-speed, -s
-        The relative speed to play back the rosbag file at
+    --playback-speed, -s [floatValue]
+        0.5 is half speed, 2 is double speed
         default: 1
-    
-    --bag-file [path]
-        The path to the rosbag file to serve
-        default: null
-    
-    --port
-        The port to run the server on
-        default: 9093
-
-    --address
-        The address to run the server on
-        default: 127.0.0.1
     
     --dummy-wss
         Use a "secure" websocket connection
         (self-signed cert/key, not actually secure)
     
-    --fast-forward-function
+    --fast-forward-function [jsFunctionString]
         The sender will skip messages as fast as possible if the function 
         returns true. This is useful for ignoring start/end conditions.
         It is a javascript function literal, for example:
-            --fast-forward-function '({message,topic})=>message.position.x<0.5'
+            --fast-forward-function '({message,topic,timeMin})=>timeMin<0.5'
         Here are the available properties on the message object:
             - message // object
             - topic // string
-            - timestamp // milliseconds float
+            - timeMin // time in minutes (relative to first message), float value
+            - timeSec
+            - timeMs
+            - unixTimeMs // time in milliseconds relative to unix epoch
+            - date // javascript Date object, ex: date.toLocaleString()
             - connectionId
             - data // Uint8Array (e.g. raw bytes)
     
-    --log-function
+    --log-function [jsFunctionString]
         A function that will be called for each non-skipped message.
         Whatever non-null value is returned will be printed.
-        Example:
-            --log-function '({ message, date, timestamp, topic })=>(topic!="/spot/odometry" ? null : [date,message])'
+        Examples:
+            --log-function '({date,topic})=>[date,topic]'
+            --log-function '({message})=>message?.pose?.pose?.position?.x'
+            --log-function '({message,date,topic})=>[date, topic, message?.pose?.pose?.position?.x]'
+            --log-function '({message,date,topic,timeMin})=>( (timeMin<0.5) ? null : [date, topic, message?.pose?.pose?.position?.x] )'
+            --log-function '({message,topic,timeMin,date,...other})=>[ date.toLocaleString(), message?.pose?.pose?.position?.x ]'
+            --log-function '({message,date,topic})=>{
+                if (topic.startsWith("/spot/odometry")) {
+                    return [date,message]
+                }
+            }'
 Notes:
-    - Giving an argument twice will use the last one given
-`)
+    - Cli arguments take precedence over config file values
+    - You can give an argument twice, but only the last one will be used
+`))
     Deno.exit()
 }
 
+if (args.configFile) {
+    if (args.debug) {
+        console.log(`Checking config file: ${JSON.stringify(args.configFile)}`)
+    }
+    if (!await FileSystem.isFileOrSymlinkToNormalFile(args.configFile)) {
+        console.warn(`[rrs] tried to load from config file, but it didn't exist: ${JSON.stringify(args.configFile)}`)
+    } else {
+        let config
+        // js or ts or jsx
+        if (args.configFile.match(/\.[jt]sx?$/)) {
+            try {
+                config = (await import(args.configFile)).default
+            } catch (error) {
+                throw Error(`${error.stack}\n\n\nbbs wasn't able to load config file: ${JSON.stringify(args.configFile)} (error above)`)
+            }
+        // assume json or yaml
+        } else {
+            const data = await FileSystem.read(args.configFile)
+            if (data == null) {
+                throw Error(`[rrs] The config file exists but something is corrupt because I'm unable to read it: ${JSON.stringify(args.configFile)}`)
+            }
+            try {
+                config = Yaml.parse(data)
+            } catch (error) {
+                throw Error(`${error.stack}\n\n\nbbs wasn't able to load config file: ${JSON.stringify(args.configFile)}\nNote: you have to options:\n    1. use a .json, .jsonc, or .yaml file\n       (thats what failed to load just now)\n    2. use a file that ends with js/ts/jsx, which will get imported`)
+            }
+        }
+
+        //
+        // use the config
+        //
+        if (config.rbbConfig) {
+            // prefer cli commands
+            Object.assign(args, config.rbbConfig, args)
+        } else {
+            console.warn(`[rrs] was able to load the config file, but I didn't see a rbbConfig field. E.g. I expect:\n    { rbbConfig: { port: 9093 } }\nNOT:\n    { port: 9093 }`)
+        }
+    }
+    if (args.debug) {
+        console.log(`Checking config file: complete`)
+    }
+}
+
+// 
+// load bag
+// 
 if (args.debug) {
-    console.log(`Loading rosbag file: ${args.bagFile}`)
+    console.log(`Loading rosbag file: ${JSON.stringify(args.bagFile)}`)
 }
-const bag = new Bag(new FileReader(args.bagFile))
-await bag.open()
-// const bag = new Bag(new FileReader(import.meta.resolve("./data.ignore/co_ral_narrow.bag").slice("file://".length)))
-    // bag.startTime
-    // bag.endTime
-    // bag.bagOpt
-const topics = [...bag.connections.values()].map(({ topic, type, messageDefinition, latching }) => ({ topic, type, latching, }))
-// messageDefinition
-const topicNames = topics.map(({ topic }) => topic)
-import * as yaml from "https://deno.land/std@0.168.0/encoding/yaml.ts"
-if (args.listTopics) {
-    console.log(`# the output is valid yaml (e.g. machine parsable/safe)`)
-    console.log(yaml.stringify({topics}))
-    Deno.exit()
+const bag = await loadBag({filePath: args.bagFile})
+if (args.debug) {
+    console.log(`Loading rosbag file: complete`)
 }
+const {topics, topicNames} = bag
 
 // evaled here so that bag,topics,etc are available
-args.logFunction = eval(args.logFunction)
-args.fastForwardFunction = eval(args.fastForwardFunction)
+args.logFunction         = typeof args.logFunction         == "string" ? eval(args.logFunction)         : args.logFunction
+args.fastForwardFunction = typeof args.fastForwardFunction == "string" ? eval(args.fastForwardFunction) : args.fastForwardFunction
 
-import { BSON } from "https://esm.sh/bson@6.10.4"
-import * as CBOR from "https://esm.sh/cbor-js@0.1.0"
-function rosEncode(message, compression = "json") {
-    const { op, id, topic, msg, service, action } = message
-    // op is one of:
-        // "publish"
-        // "service_response"
-        // "call_service"
-        // "send_action_goal"
-        // "cancel_action_goal"
-        // "action_feedback"
-        // "action_result"
-        // "png"
-        // "status"
-    // compression is one of:
-    // "json"
-    // "cbor"
-    // "bson"
-
-    let rawData
-    if (compression == "json") {
-        message = JSON.stringify(message, (_, value) =>typeof value === 'bigint' ? value.toString() : value)
-    } else if (compression == "cbor") {
-        message = CBOR.encode(message)
-    } else if (compression == "bson") {
-        message = BSON.serialize(message)
-    } else {
-        throw Error(`Unknown compression type: ${compression}`)
-    }
-
-    return message
+// 
+// pick action
+// 
+if (args.listTopics) {
+    console.log(`# the output is valid yaml (e.g. machine parsable/safe)`)
+    console.log(Yaml.stringify({topics}))
+    Deno.exit()
+} else if (args.summarize) {
+    await printSummary(bag)
+    Deno.exit()
+} else {
+    // will never finish but await helps with error message stack traces
+    await serveRosbag(bag, args)
 }
-
-let subscribers = []
-let startTimeMilliseconds = null
-
-function timestampToMilliseconds({ sec, nsec }) {
-    return (sec * 1000) + nsec / 1000000
-}
-
-//
-// start sending out messages
-//
-;(async () => {
-    const playbackSpeed = args.playbackSpeed
-    let prevFakeTime = null
-    let prevRealTime = 0
-    while (1) {
-        // TODO: to be more efficient, there should be some batching+lookahead here
-        for await (const item of bag.messageIterator({ topics: args.topicWhitelist || topicNames })) {
-            const { topic, connectionId, timestamp, data, message } = item
-            const { sec, nsec } = timestamp
-            if (startTimeMilliseconds == null) {
-                if (args.useTimestampsAsOffsets) {
-                    startTimeMilliseconds = Date.now()
-                } else {
-                    startTimeMilliseconds = 0
-                }
-            }
-            const timestampMilliseconds = timestampToMilliseconds(timestamp)
-            const date = new Date(timestampMilliseconds)
-            if (args.fastForwardFunction && args.fastForwardFunction({ ...item, date, timestamp: timestampMilliseconds })) {
-                continue
-            }
-            if (args.logFunction) {
-                const logValue = args.logFunction({ ...item, date, timestamp: timestampMilliseconds })
-                if (logValue!=null) {
-                    Console.write(`${logValue}\r`)
-                }
-            }
-            if (prevFakeTime == null) {
-                prevFakeTime = timestampMilliseconds + startTimeMilliseconds
-                prevRealTime = performance.now()
-            } else {
-                const realTimeGap = performance.now() - prevRealTime
-                prevRealTime = performance.now()
-                const fakeTime = timestampMilliseconds + startTimeMilliseconds
-                const desiredTimeGap = (fakeTime - prevFakeTime) / playbackSpeed
-                prevFakeTime = fakeTime
-                if (prevFakeTime >= 2) {
-                    // 2ms is the smallest realistic amount of time
-                    await new Promise((r) => setTimeout(r, desiredTimeGap))
-                }
-            }
-            
-            // console.log(`sending message of ${topic}`)
-            if (subscribers.length != 0) {
-                const messageBytes = rosEncode({
-                    op: "publish",
-                    topic: item.topic,
-                    msg: { name: item.topic, timestamp, data: item.message},
-                })
-                for (const each of subscribers) {
-                    if (args.debug) {
-                        console.debug(`publishing item.topic is:`,item.topic)
-                    }
-                    // FIXME: ensure these are always encoded correctly (how are services handled?)
-                    each.send(messageBytes)
-                }
-            }
-
-            // {
-            //     topic: "/clock",
-            //     connectionId: 0,
-            //     timestamp: { sec: 1720510809, nsec: 899027777 },
-            //     data: Uint8Array(8) [
-            //         65,  86, 237, 101,
-            //         232, 242,  86,  50
-            //     ],
-            //     message: Record { clock: { sec: 1710052929, nsec: 844559080 } }
-            // }
-        }
-        console.log(`#`)
-        console.log(`# reached end of rosbag file`)
-        console.log(`#`)
-        if (args.noRepeatOnEnd) {
-            break
-        } else {
-            console.log(`# repeating from the beginning, use --no-repeat-on-end to disable this behavior`)
-        }
-    }
-})()
-
-let extras = {}
-if (args.dummyWss) {
-    extras = {
-        cert: certFileContents,
-        key: keyFileContents,
-    }
-}
-Deno.serve(
-    {
-        port: args.port-0,
-        hostname: args.address,
-        ...extras,
-        // onListen: () => {
-        //   console.log(`Running on http://127.0.0.1:9093`)
-        // },
-    },
-    (req) => {
-        //
-        // asked for something other than websocket
-        //
-        if (req.headers.get("upgrade") != "websocket") {
-            return new Response(new TextEncoder().encode("howdee"), { status: 200, headers: { "content-type": "text/plain" } })
-        }
-
-        const { socket, response } = Deno.upgradeWebSocket(req)
-        subscribers.push(socket)
-        socket.addEventListener("open", () => {
-            console.log("a client connected!")
-        })
-        socket.addEventListener("message", (event) => {
-            // TODO: clean up
-            if (event.data === "ping") {
-                console.log(`got ping`)
-            }
-        })
-        socket.addEventListener("close", () => {
-            subscribers = subscribers.filter((each) => each !== socket)
-        })
-
-        return response
-    }
-)

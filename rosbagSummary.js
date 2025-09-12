@@ -1,10 +1,10 @@
 #!/usr/bin/env -S deno run --allow-all
 import { loadBag } from "./main/tools/loadBag.js"
 import { FileSystem, glob } from "https://deno.land/x/quickr@0.8.1/main/file_system.js"
-import { indent } from 'https://esm.sh/gh/jeff-hykin/good-js@1.17.2.0/source/flattened/indent.js'
+import { indent } from 'https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/indent.js'
 
-import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/parse_args.js"
-import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/did_you_mean.js"
+import { parseArgs, flag, required, initialValue } from "https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/parse_args.js"
+import { didYouMean } from "https://esm.sh/gh/jeff-hykin/good-js@1.18.2.0/source/flattened/did_you_mean.js"
 import Yaml from 'https://esm.sh/yaml@2.4.3'
 
 const argsInfo = parseArgs({
