@@ -41,6 +41,9 @@ Options:
     --bag-file [path]
         The path to the rosbag file to serve
         default: ./data.ignore/co_ral_narrow.bag
+    
+    --list-topics
+        List all the topics in the rosbag file, then exit
 `)
 }
 
@@ -48,6 +51,11 @@ if (args.debug) {
     console.log(`# Loading rosbag file: ${args.bagFile}`)
 }
 const bag = await loadBag({filePath: args.bagFile})
+if (args.listTopics) {
+    console.log(`# the output is valid yaml (e.g. machine parsable/safe)`)
+    console.log(Yaml.stringify({topics}))
+    Deno.exit()
+}
     // bag.startTime
     // bag.endTime
     // bag.bagOpt
@@ -57,6 +65,7 @@ if (true) {
     console.log(`# the output is valid yaml (e.g. machine parsable/safe)`)
     console.log(Yaml.stringify({topics: bag.topics}))
 }
+
 
 //
 // start sending out messages
