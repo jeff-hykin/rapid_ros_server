@@ -10,8 +10,7 @@ First install Deno, then install `rrs`
 
 ```sh
 # install Deno
-curl -fsSL https://deno.land/x/install/install.sh | sh
-# windows users do: irm https://deno.land/install.ps1 | iex
+irm https://deno.land/install.ps1 | iex || curl -fsSL https://deno.land/install.sh | sh
 
 # install rrs (ros bag backend)
 deno install -n rrs -Afrg --reload https://raw.githubusercontent.com/jeff-hykin/rapid_ros_server/dev/rosbagAsBackend.js
